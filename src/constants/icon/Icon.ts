@@ -5,6 +5,8 @@ import { ImCancelCircle } from "react-icons/im";
 import { HiVolumeUp, HiVolumeOff } from "react-icons/hi";
 import { BsPlay, BsFillPlayFill, BsFillPauseFill } from "react-icons/bs";
 import { GoVerified } from "react-icons/go";
+import { FaCloudUploadAlt } from "react-icons/fa";
+import { MdDelete } from "react-icons/md";
 
 const exportIcons = {
   AiOutlineLogout,
@@ -19,6 +21,8 @@ const exportIcons = {
   BsFillPlayFill,
   BsFillPauseFill,
   GoVerified,
+  FaCloudUploadAlt,
+  MdDelete,
 };
 
 export default exportIcons;
