@@ -6,6 +6,9 @@ import axios from "axios";
 import { BASE_URL } from "@/utils";
 import { Video } from "types";
 import Icons from "@/constants/icon";
+import useAuthStore from "@/store/authStore";
+import Comments from "@/components/Comments";
+import LikeButton from "@/components/LikeButton";
 
 interface IProps {
   postDetails: Video;
@@ -17,6 +20,9 @@ const Detail = ({ postDetails }: IProps) => {
   const [isVideoMuted, setIsVideoMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const router = useRouter();
+  const { userProfile } = useAuthStore();
+  const [comment, setComment] = useState("");
+  const [isPostingComment, setIsPostingComment] = useState(false);
 
   const onVideoClick = () => {
     if (playing) {
@@ -25,6 +31,35 @@ const Detail = ({ postDetails }: IProps) => {
     } else {
       videoRef?.current?.play();
       setPlaying(true);
+    }
+  };
+
+  const handleLike = async (like: boolean) => {
+    if (userProfile) {
+      const { data } = await axios.put(`${BASE_URL}/api/like`, {
+        userId: userProfile._id,
+        postId: post._id,
+        like,
+      });
+
+      setPost({ ...post, likes: data.likes });
+    }
+  };
+
+  const addComment = async (e) => {
+    e.preventDefault();
+
+    if (userProfile && comment) {
+      setIsPostingComment(true);
+
+      const { data } = await axios.put(`${BASE_URL}/api/post/${post._id}`, {
+        userId: userProfile._id,
+        comment,
+      });
+
+      setPost({ ...post, comments: data.comments });
+      setComment('')
+      setIsPostingComment(false)
     }
   };
 
@@ -77,8 +112,55 @@ const Detail = ({ postDetails }: IProps) => {
         </div>
       </div>
 
-      <div>
-        
+      <div className="relative w-[1000px] md:w-[900px] lg:w-[700px]">
+        <div className="lg:mt-20 mt-10">
+          <div className="flex gap-3 p-2 cursor-pointer font-semibold rounded">
+            <div className="ml-4 md:w-20 md:h-20 w-16 h-16">
+              <Link href="/">
+                <>
+                  <Image
+                    width={62}
+                    height={62}
+                    className="rounded-full"
+                    src={post.postedBy.image}
+                    alt="profile photo"
+                  />
+                </>
+              </Link>
+            </div>
+            <div>
+              <Link href="/">
+                <div className="mt-3 flex flex-col gap-2">
+                  <p className="flex gap-2 items-center md:text-md font-bold text-primary">
+                    {post.postedBy.userName}{" "}
+                    <Icons.GoVerified className="text-blue-400 text-md" />
+                  </p>
+                  <p className="capitalize font-medium text-xs text-gray-500 hidden md:block">
+                    {post.postedBy.userName}
+                  </p>
+                </div>
+              </Link>
+            </div>
+          </div>
+
+          <p className="px-10 text-lg text-gray-600">{post.caption}</p>
+          <div className="mt-10 px-10">
+            {userProfile && (
+              <LikeButton
+                likes={post.likes}
+                handleLike={() => handleLike(true)}
+                handleDislike={() => handleLike(false)}
+              />
+            )}
+          </div>
+          <Comments
+            comment={comment}
+            setComment={setComment}
+            addComment={addComment}
+            comments={post.comments}
+            isPostingComment={isPostingComment}
+          />
+        </div>
       </div>
     </div>
   );
