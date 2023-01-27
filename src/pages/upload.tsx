@@ -11,7 +11,7 @@ import { topics } from "@/utils/constants";
 
 import { BASE_URL } from "@/utils";
 
-const upload = () => {
+const Upload = () => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -178,4 +178,4 @@ const upload = () => {
   );
 };
 
-export default upload;
+export default Upload;
